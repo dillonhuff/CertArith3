@@ -71,7 +71,7 @@ Inductive rsInstrEvalR : rsMachine -> rsInstr -> rsMachine -> Prop :=
            (fun x => if beq_rsReg x r then v else rvm x) ram stk)
 | RSInstrEvalR_rsBinop :
     forall r0 r1 b rvm ram stk r,
-      rsBopEvalR b (rvm r0) (rvm r1) r ->
+      rsBopEvalR b (rvm r1) (rvm r0) r ->
       rsInstrEvalR
         (Build_rsMachine rvm ram stk)
         (RSBinop b r0 r1)
@@ -80,5 +80,5 @@ Inductive rsInstrEvalR : rsMachine -> rsInstr -> rsMachine -> Prop :=
            ram
            stk).
 
-        
 (* RSMachine properties *)
+

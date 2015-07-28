@@ -14,7 +14,10 @@ RSMachine.vo: RSMachine.v
 StkMachine.vo: StkMachine.v
 	$(CC) $<
 
-Arith.vo: Arith.v StkMachine.vo
+Arith.vo: Arith.v
+	$(CC) $<
+
+ArithToStk.vo: ArithToStk.v Arith.vo StkMachine.vo
 	$(CC) $<
 
 clean:

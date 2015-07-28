@@ -2,7 +2,6 @@ Require Import ZArith.
 Require Import List.
 
 Require Import StkMachine.
-Require Import X86.
 
 (* Arithmetic expressions with variables *)
 

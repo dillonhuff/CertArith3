@@ -20,6 +20,9 @@ Arith.vo: Arith.v
 ArithToStk.vo: ArithToStk.v Arith.vo StkMachine.vo
 	$(CC) $<
 
+StkToRS.vo: StkToRS.v StkMachine.vo RSMachine.vo
+	$(CC) $<
+
 clean:
 	find ./ -type f -name '*.vo' -delete
 	find ./ -type f -name '*.glob' -delete

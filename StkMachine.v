@@ -3,6 +3,7 @@ Require Import List ZArith.
 (* Stack machine definition *)
 
 Definition stkArg : Set := nat.
+Definition stkArgName (a : stkArg) : nat := a.
 
 Inductive sBop : Set :=
 | SAdd : sBop

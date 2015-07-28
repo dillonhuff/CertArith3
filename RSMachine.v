@@ -13,7 +13,8 @@ Definition beq_rsReg (r0 r1 : rsReg) : bool :=
     | _, _ => false
   end.
 
-Definition rsArg := nat.
+Inductive rsArg : Set :=
+| RSArg : nat -> rsArg.
 
 Inductive rsBop : Set :=
 | RSAdd : rsBop
@@ -79,6 +80,4 @@ Inductive rsInstrEvalR : rsMachine -> rsInstr -> rsMachine -> Prop :=
            (fun x => if beq_rsReg x r1 then r else rvm x)
            ram
            stk).
-
-(* RSMachine properties *)
 

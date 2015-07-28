@@ -112,17 +112,8 @@ Theorem stkProgram_cons :
     stkProgEvalR sm1' p sm2 ->
     stkProgEvalR sm1 (i :: p) sm2.
 Proof.
-  intros.
-  inversion H0.
-  apply (StkProgEvalR_cons i nil sm1 sm2 sm1').
-
-  assumption.
-  congruence.
-
-  apply (StkProgEvalR_cons i (i0 :: p0) sm1 sm2 sm1').
-
-  assumption.
-  congruence.
+  intros; inversion H0; eapply StkProgEvalR_cons; eauto.
+  congruence. congruence.
 Qed.
 
 Theorem stkProgram_concat :
@@ -139,11 +130,7 @@ Proof.
   intros.
   rewrite <- app_comm_cons.
   inversion H.
-  apply (StkProgEvalR_cons a (p1 ++ p2) sm1 sm2 sm1'0).
-
-  assumption.
-
-  specialize (IHp1 p2 sm1'0 sm2 sm1').
+  eapply StkProgEvalR_cons. eauto.
   eauto.
 Qed.
 
@@ -165,11 +152,7 @@ Proof.
   induction p1.
 
   intros. simpl in H.
-  eapply ex_intro. split.
-
-  apply (StkProgEvalR_nil sm1).
-
-  assumption.
+  eapply ex_intro. split. apply StkProgEvalR_nil. assumption.
 
   (* Inductive step *)
   intros.
@@ -177,7 +160,6 @@ Proof.
   rewrite <- app_comm_cons in H.
 
   inversion H.
-  specialize (IHp1 p2 sm1' sm2).
   apply IHp1 in H5. inversion H5. inversion H6.
   clear H6. clear H5.
 
@@ -185,11 +167,17 @@ Proof.
 
   split.
 
-  apply (StkProgEvalR_cons a p1 sm1 x sm1'). assumption.
-
+  apply (StkProgEvalR_cons a p1 sm1 x sm1'); assumption.
   assumption.
+Qed.
 
-  assumption.
+Lemma stkProgram_cons_nil :
+  forall i sm1 sm2,
+    stkInstrEvalR sm1 i sm2 ->
+    stkProgEvalR sm1 (i :: nil) sm2.
+Proof.
+  intros; apply (StkProgEvalR_cons i nil sm1 sm2 sm2); 
+  first [assumption | apply StkProgEvalR_nil].
 Qed.
 
 (* Compilation of aExps to stackPrograms *)
@@ -233,19 +221,6 @@ Proof.
   simpl aBopToSBop; auto using sBopEvalR_add, sBopEvalR_sub, sBopEvalR_mul.
 Qed.
 
-Lemma stkProgram_cons_nil :
-  forall i sm1 sm2,
-    stkInstrEvalR sm1 i sm2 ->
-    stkProgEvalR sm1 (i :: nil) sm2.
-Proof.
-  intros.
-  apply (StkProgEvalR_cons i nil sm1 sm2 sm2).
-  
-  assumption.
-
-  apply StkProgEvalR_nil.
-Qed.
-
 Theorem aExpToStackProgram_top_is_correct :
   forall e m stk,
     stkProgEvalR
@@ -263,7 +238,7 @@ Proof.
   intros. unfold aExpToStackProgram. fold aExpToStackProgram.
   
   specialize (IHe1 m stk).
-  specialize (IHe2 m ((aExpEval e1 m) :: stk)).
+  specialize (IHe2 m (aExpEval e1 m :: stk)).
 
   pose proof stkProgram_concat.
   specialize (H (aExpToStackProgram e1) (aExpToStackProgram e2)
@@ -282,9 +257,9 @@ Proof.
   pose proof stkProgram_cons_nil.
   specialize (H0 (SBinop (aBopToSBop a))
                  (Build_stkMachine
-                    (initStkArgMap m) ((aExpEval e2 m) :: (aExpEval e1 m) :: stk))
+                    (initStkArgMap m) (aExpEval e2 m :: aExpEval e1 m :: stk))
                  (Build_stkMachine
-                    (initStkArgMap m) ((aExpEval (ABinop a e1 e2) m) :: stk))).
+                    (initStkArgMap m) (aExpEval (ABinop a e1 e2) m :: stk))).
   apply H0 in H.
   clear H0.
   
@@ -308,3 +283,20 @@ Proof.
 
   assumption.
 Qed.
+
+(* x86-64 processor model *)
+
+(* We only need a few registers *)
+Inductive x86Reg : Set :=
+| RAX : x86Reg
+| RCX : x86Reg
+| RBP : x86Reg
+| RSP : x86Reg.
+
+Inductive x86Instr : Set :=
+| Pushq : x86Reg -> x86Instr
+| Popq : x86Reg -> x86Instr
+| Addq : x86Reg -> x86Reg -> x86Instr
+| Subq : x86Reg -> x86Reg -> x86Instr
+| IMulq : x86Reg -> x86Reg -> x86Instr
+| Ret.

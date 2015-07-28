@@ -8,6 +8,9 @@ all: $(OBJ)
 X86.vo: X86.v
 	$(CC) $<
 
+RSMachine.vo: RSMachine.v
+	$(CC) $<
+
 StkMachine.vo: StkMachine.v
 	$(CC) $<
 
